@@ -1,0 +1,35 @@
+---
+- name: Check for nvidia keyring
+  ansible.builtin.stat:
+    path: /etc/apt/keyrings/nvidia-container-toolkit-keyring.gpg
+  register: nvidia_keyring
+
+- name: Download the nvidia keyring
+  ansible.builtin.shell: |
+    curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey > /tmp/nvidia-container-toolkit-keyring.gpg
+    gpg --dearmor -o /etc/apt/keyrings/nvidia-container-toolkit-keyring.gpg /tmp/nvidia-container-toolkit-keyring.gpg
+    rm /tmp/nvidia-container-toolkit-keyring.gpg
+  when: not nvidia_keyring.stat.exists
+  become: true
+
+- name: Set the distribution identifier
+  ansible.builtin.shell: |
+    . /etc/os-release; echo $ID$VERSION_ID
+  register: distro_id
+  changed_when: false
+
+- name: Add the nvidia repo
+  ansible.builtin.template:
+    src: etc/apt/sources.list.d/nvidia.list.j2
+    dest: /etc/apt/sources.list.d/nvidia.list
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Install nvidia packages
+  ansible.builtin.package:
+    name: "{{ docker_nvidia_packages }}"
+    state: present
+    update_cache: yes
+  become: true

@@ -1,0 +1,44 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: Get OS/Distro info
+      ansible.builtin.raw: cat /etc/os-release
+      changed_when: false
+      register: os_info
+
+    - name: Include tasks for Arch
+      ansible.builtin.include_tasks: "tasks/prepare_arch.yml"
+      when: "'NAME=\"Arch Linux\"' in os_info.stdout"
+
+    - name: Include tasks for Debian/Ubuntu
+      ansible.builtin.include_tasks: "tasks/prepare_debian.yml"
+      when: "'NAME=\"Debian GNU/Linux\"' in os_info.stdout or 'NAME=\"Ubuntu\"' in os_info.stdout"
+
+    - name: Install sudo
+      ansible.builtin.package:
+        name: sudo
+        state: present
+
+    - name: Create molecule test user
+      ansible.builtin.user:
+        name: molecule
+        comment: molecule test user
+        shell: /bin/bash
+        state: present
+
+    - name: Remove configured nameservers
+      ansible.builtin.lineinfile:
+        path: /etc/resolv.conf
+        regexp: '^nameserver'
+        state: absent
+
+    - name: Add local nameserver
+      ansible.builtin.lineinfile:
+        path: /etc/resolv.conf
+        regexp: '^nameserver'
+        line: 'nameserver 10.1.1.1'
+        state: present

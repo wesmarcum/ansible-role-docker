@@ -1,0 +1,28 @@
+---
+galaxy_info:
+  role_name: docker
+  namespace: wesmarcum
+  author: Wes Marcum
+  description: Install and configure Docker on Linux.
+  license: MIT
+  min_ansible_version: 2.9
+  platforms:
+    - name: ArchLinux
+      versions:
+        - any
+    - name: Debian
+      versions:
+        - buster
+        - bullseye
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+  galaxy_tags:
+    - docker
+    - compose
+    - containers
+    - server
+    - system
+  dependencies:
+    - kewlfft.aur

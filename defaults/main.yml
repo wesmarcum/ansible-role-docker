@@ -1,0 +1,52 @@
+---
+# Edition to install.  Can be 'ce' (community edition) or 'ee' (enterprise edition)
+docker_edition: 'ce'
+
+# URL for docker repo
+docker_repo_url: "https://download.docker.com/linux"
+
+# Default architecture for docker packages.
+docker_arch: amd64
+
+# List of users to add to the 'docker' group.
+docker_users: []
+
+# Docker ipv4 bridge network.
+docker_ipv4_network: "172.16.0.1/24"
+
+# Docker ipv6 bridge network.
+docker_ipv6_network: "fd0a:0001:0002:0003::/64"
+
+# Docker storage driver.
+docker_storage_driver: "overlay2"
+
+# Docker release, append 'nightly' or 'test' (or both) if you wish to live on the edge.
+docker_release_channel: "stable"
+
+# Option to install the nvidia container runtime/toolkit.
+docker_nvidia_install: false
+docker_nvidia_experimental: false
+
+# Install docker compose from the docker repo.
+docker_compose_install: false
+
+# Or install the latest version of compose from Github.
+docker_compose_install_github: false
+docker_compose_arch: "docker-compose-linux-x86_64"
+
+# Install pip and the 'docker' python package
+docker_pip_install: false
+
+# Docker daemon configuration.  This will be converted to json in the daemon.json file.
+docker_daemon_configuration:
+  storage-driver: "{{ docker_storage_driver }}"
+  bip: "{{ docker_ipv4_network }}"
+  ipv6: true
+  fixed-cidr-v6: "{{ docker_ipv6_network }}"
+
+# Docker nvidia runtime configuration.  Combined with the docker_daemon_configuration if enabled.
+docker_nvidia_configuration:
+  runtimes:
+    nvidia:
+      path: /usr/bin/nvidia-container-runtime
+      runtimeArgs: []

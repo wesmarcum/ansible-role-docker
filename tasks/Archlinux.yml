@@ -1,0 +1,12 @@
+---
+- name: Install dependencies
+  ansible.builtin.package:
+    name: "{{ docker_dependencies }}"
+    state: present
+  become: true
+
+- name: Install docker engine
+  ansible.builtin.package:
+    name: "{{ docker_packages }}"
+    state: present
+  become: true

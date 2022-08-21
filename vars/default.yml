@@ -1,0 +1,34 @@
+---
+# Required packages for docker.
+docker_dependencies:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - lsb-release
+  - gnupg
+  - gnupg-agent
+  - software-properties-common
+
+# Main docker packages for installation.
+docker_packages:
+  - "docker-{{ docker_edition }}"
+  - "docker-{{ docker_edition }}-cli"
+  - "docker-{{ docker_edition }}-rootless-extras"
+  - containerd.io
+
+# Compose package name.
+docker_compose_packages:
+  - docker-compose-plugin
+
+# Nvidia packages for libnvidia-container (https://nvidia.github.io/libnvidia-container/).
+docker_nvidia_packages:
+  - nvidia-docker2
+  - nvidia-container-runtime
+  - nvidia-container-toolkit
+
+# Location for docker compose v2.
+docker_compose_dir: "/usr/libexec/docker/cli-plugins"
+
+# Pip package names for installing the 'docker' python package.
+pip_package: python3-pip
+pip_executable: "{{ 'pip3' if pip_package.startswith('python3') else 'pip' }}"

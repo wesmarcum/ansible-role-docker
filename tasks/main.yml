@@ -1,0 +1,101 @@
+---
+- name: Set OS specific variables
+  ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - '{{ ansible_distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+        - default.yml
+      paths:
+        - vars
+
+- name: Include OS specific tasks
+  ansible.builtin.include_tasks: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - '{{ ansible_distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+        - default.yml
+      paths:
+        - tasks
+
+- name: Add docker group
+  ansible.builtin.group:
+    name: docker
+    state: present
+  become: true
+
+- name: Add users to docker group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: docker
+    append: yes
+  loop: "{{ docker_users }}"
+  when: docker_users | length > 0
+  become: true
+
+- name: Install nvidia runtime
+  ansible.builtin.include_tasks: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - 'nvidia_install_{{ ansible_distribution }}.yml'
+        - 'nvidia_install_{{ ansible_os_family }}.yml'
+        - nvidia_install.yml
+      paths:
+        - tasks
+  when: docker_nvidia_install | bool
+
+- name: Install docker compose from Github
+  ansible.builtin.include_tasks: "tasks/compose_install_github.yml"
+  when: (docker_compose_install_github | bool) and (not docker_compose_install | bool)
+
+- name: Install docker compose plugin
+  ansible.builtin.package:
+    name: "{{ docker_compose_packages }}"
+    state: present
+  when: (docker_compose_install | bool) and (not docker_compose_install_github | bool)
+  become: true
+
+- name: Install docker pip package
+  ansible.builtin.include_tasks: "tasks/pip_install.yml"
+  when: docker_pip_install | bool
+
+- name: Ensure /etc/docker exists
+  ansible.builtin.file:
+    path: /etc/docker
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  become: true
+
+- name: Set docker daemon configuration for nvidia
+  ansible.builtin.set_fact:
+    docker_daemon_configuration: "{{ docker_daemon_configuration | combine(docker_nvidia_configuration) }}"
+  when: docker_nvidia_install
+
+- name: Configure docker daemon
+  ansible.builtin.copy:
+    content: "{{ docker_daemon_configuration | to_nice_json }}"
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+  become: true
+  when: docker_daemon_configuration.keys() | length > 0
+  notify:
+    - restart docker
+
+- name: Enable the docker service
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: yes
+  become: true
+
+- name: Run handlers
+  ansible.builtin.meta: flush_handlers

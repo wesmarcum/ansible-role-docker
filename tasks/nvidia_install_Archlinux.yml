@@ -1,0 +1,42 @@
+---
+- name: Create the `aur_builder` user
+  ansible.builtin.user:
+    name: aur_builder
+    create_home: yes
+    group: wheel
+  become: true
+
+- name: Create remote_tmp ansible directory
+  ansible.builtin.file:
+    path: /home/aur_builder/.ansible/tmp
+    state: directory
+    owner: aur_builder
+    group: wheel
+    mode: 0700
+  become: true
+
+- name: Allow the `aur_builder` user to run `sudo pacman` without a password
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/11-install-aur_builder
+    line: 'aur_builder ALL=(ALL) NOPASSWD: /usr/bin/pacman'
+    create: yes
+    validate: 'visudo -cf %s'
+  become: true
+
+- name: Check for yay
+  ansible.builtin.stat:
+    path: /usr/bin/yay
+  register: check_yay
+
+- name: Install yay if not found
+  ansible.builtin.include_tasks: "tasks/yay_install.yml"
+  when: not check_yay.stat.exists
+
+- name: Install nvidia packages
+  kewlfft.aur.aur:
+    name: "{{ docker_nvidia_packages }}"
+    state: present
+    update_cache: yes
+    use: yay
+  become: true
+  become_user: aur_builder

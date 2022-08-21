@@ -1,0 +1,30 @@
+---
+# Required packages for docker.
+docker_dependencies:
+  - ca-certificates
+  - curl
+  - lsb-release
+  - gnupg
+
+# Main docker packages for installation.
+docker_packages:
+  - docker
+
+# Compose package name.
+docker_compose_packages:
+  - docker-compose
+
+# Nvidia packages for libnvidia-container (https://nvidia.github.io/libnvidia-container/).
+docker_nvidia_packages:
+  - nvidia-container-toolkit
+  - nvidia-container-runtime
+
+# Location for docker compose v2.
+docker_compose_dir: "/usr/lib/docker/cli-plugins"
+
+# Pip package names for installing the 'docker' python package.
+pip_package: python-pip
+pip_executable: "{{ 'pip3' if pip_package.startswith('python3') else 'pip' }}"
+
+# Yay source repo.  Used only for installing nvidia packages.
+yay_repo: "https://aur.archlinux.org/yay-bin.git"

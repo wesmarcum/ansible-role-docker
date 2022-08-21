@@ -1,0 +1,51 @@
+---
+- name: Remove old versions of Docker
+  ansible.builtin.package:
+    name:
+      - docker
+      - docker-engine
+    state: absent
+  become: true
+
+- name: Install dependencies
+  ansible.builtin.package:
+    name: "{{ docker_dependencies }}"
+    state: present
+  become: true
+
+- name: Create keyring directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  become: true
+
+- name: Check for docker keyring
+  ansible.builtin.stat:
+    path: /etc/apt/keyrings/docker.gpg
+  register: docker_keyring
+
+- name: Get docker keyring
+  ansible.builtin.shell: |
+    curl -fsSL https://download.docker.com/linux/debian/gpg > /tmp/docker.gpg
+    gpg --dearmor -o /etc/apt/keyrings/docker.gpg /tmp/docker.gpg
+    rm /tmp/docker.gpg
+  when: not docker_keyring.stat.exists
+  become: true
+
+- name: Add docker repo
+  ansible.builtin.apt_repository:
+    repo: "deb [arch={{ docker_arch }} signed-by=/etc/apt/keyrings/docker.gpg] {{ docker_repo_url }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} {{ docker_release_channel }}"
+    state: present
+    filename: docker
+    mode: '0644'
+    update_cache: yes
+  become: true
+
+- name: Install docker engine
+  ansible.builtin.package:
+    name: "{{ docker_packages }}"
+    state: present
+  become: true

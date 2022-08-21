@@ -1,0 +1,49 @@
+---
+- name: Get compose release info from Github
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/docker/compose/releases/latest
+    return_content: true
+  register: compose_latest
+
+- name: Check for current compose install
+  ansible.builtin.stat:
+    path: "{{ docker_compose_dir }}/docker-compose"
+  register: compose_check
+
+- name: Get compose version.
+  block:
+    - name: Compose - get current version
+      ansible.builtin.command:
+        cmd: "docker compose version"
+      register: compose_version_check
+      changed_when: False
+
+    - name: Compose - set current version
+      ansible.builtin.set_fact:
+        compose_current_version: "{{ compose_version_check.stdout | regex_search('\\d+\\.\\d+.\\d+') }}"
+  when: compose_check.stat.exists
+
+- name: Compose - set facts for versions
+  ansible.builtin.set_fact:
+    compose_needs_update: false
+    compose_available_version: "{{ compose_latest.json.tag_name | replace('v','') }}"
+
+- name: Compose - check if update needed
+  ansible.builtin.set_fact:
+    compose_needs_update: true
+  when:
+    - compose_current_version is defined
+    - compose_current_version is version(item, "<")
+  with_items: "{{ compose_available_version }}"
+
+- name: Download compose
+  block:
+    - name: Compose - download from github
+      ansible.builtin.get_url:
+        url: "https://github.com/docker/compose/releases/download/v{{ compose_available_version }}/{{ docker_compose_arch }}"
+        dest: "{{ docker_compose_dir }}/docker-compose"
+        owner: root
+        group: root
+        mode: 0755
+      become: true
+  when: compose_needs_update or not compose_check.stat.exists

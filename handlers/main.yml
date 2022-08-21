@@ -1,0 +1,22 @@
+---
+- name: update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+  become: true
+
+- name: restart docker
+  ansible.builtin.service:
+    name: docker
+    state: restarted
+  become: true
+
+- name: restart nftables
+  ansible.builtin.service:
+    name: nftables
+    state: restarted
+  become: true
+
+- name: sysctl load
+  ansible.builtin.command:
+    cmd: sysctl --system
+  become: true

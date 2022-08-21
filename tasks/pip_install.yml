@@ -1,0 +1,13 @@
+---
+- name: Install pip
+  ansible.builtin.package:
+    name: "{{ pip_package }}"
+    state: present
+  become: true
+
+- name: Install docker pip package
+  ansible.builtin.pip:
+    name: docker
+    state: present
+    executable: "{{ pip_executable }}"
+  become: true

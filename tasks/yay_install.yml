@@ -1,0 +1,21 @@
+---
+- name: Install dependencies
+  ansible.builtin.package:
+    name:
+      - git
+      - base-devel
+    state: present
+  become: true
+
+- name: Clone the yay repo
+  ansible.builtin.git:
+    repo: "{{ yay_repo }}"
+    dest: yay-bin
+    clone: yes
+    update: yes
+    version: 'master'
+
+- name: Build yay
+  ansible.builtin.shell: |
+    cd yay-bin && makepkg -si --noconfirm
+  changed_when: false
