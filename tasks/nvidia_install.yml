@@ -10,6 +10,7 @@
     gpg --dearmor -o /etc/apt/keyrings/nvidia-container-toolkit-keyring.gpg /tmp/nvidia-container-toolkit-keyring.gpg
     rm /tmp/nvidia-container-toolkit-keyring.gpg
   when: not nvidia_keyring.stat.exists
+  changed_when: true
   become: true
 
 - name: Set the distribution identifier

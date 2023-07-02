@@ -33,6 +33,7 @@
     gpg --dearmor -o /etc/apt/keyrings/docker.gpg /tmp/docker.gpg
     rm /tmp/docker.gpg
   when: not docker_keyring.stat.exists
+  changed_when: true
   become: true
 
 - name: Add docker repo

@@ -11,6 +11,7 @@
   register: compose_check
 
 - name: Get compose version.
+  when: compose_check.stat.exists
   block:
     - name: Compose - get current version
       ansible.builtin.command:
@@ -21,7 +22,6 @@
     - name: Compose - set current version
       ansible.builtin.set_fact:
         compose_current_version: "{{ compose_version_check.stdout | regex_search('\\d+\\.\\d+.\\d+') }}"
-  when: compose_check.stat.exists
 
 - name: Compose - set facts for versions
   ansible.builtin.set_fact:
@@ -37,6 +37,7 @@
   with_items: "{{ compose_available_version }}"
 
 - name: Download compose
+  when: compose_needs_update or not compose_check.stat.exists
   block:
     - name: Compose - download from github
       ansible.builtin.get_url:
@@ -46,4 +47,3 @@
         group: root
         mode: 0755
       become: true
-  when: compose_needs_update or not compose_check.stat.exists
