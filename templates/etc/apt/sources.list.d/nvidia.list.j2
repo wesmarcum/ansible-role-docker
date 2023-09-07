@@ -1,10 +1,7 @@
-# Nvidia main
-deb [signed-by=/etc/apt/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/{{ distro_id.stdout }}/$(ARCH) /
-deb [signed-by=/etc/apt/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/nvidia-container-runtime/stable/{{ distro_id.stdout }}/$(ARCH) /
-deb [signed-by=/etc/apt/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/nvidia-docker/{{ distro_id.stdout }}/$(ARCH) /
-{% if docker_nvidia_experimental %}
-
+{% if docker_nvidia_experimental | bool %}
 # Nvidia experimental
-deb [signed-by=/etc/apt/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/experimental/{{ distro_id.stdout }}/$(ARCH) /
-deb [signed-by=/etc/apt/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/nvidia-container-runtime/experimental/{{ distro_id.stdout }}/$(ARCH) /
+deb [signed-by=/etc/apt/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/experimental/deb/$(ARCH) /
+{% else %}
+# Nvidia stable
+deb [signed-by=/etc/apt/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /
 {% endif %}

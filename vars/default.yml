@@ -22,8 +22,6 @@ docker_compose_packages:
 
 # Nvidia packages for libnvidia-container (https://nvidia.github.io/libnvidia-container/).
 docker_nvidia_packages:
-  - nvidia-docker2
-  - nvidia-container-runtime
   - nvidia-container-toolkit
 
 # Location for docker compose v2.
