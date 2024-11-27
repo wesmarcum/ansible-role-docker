@@ -1,7 +1,7 @@
 Ansible Role: docker
 ====================
+
 [![Galaxy Role][badge-galaxy]][link-galaxy]
-[![Ansible Quality Score][badge-quality]][link-galaxy]
 [![MIT licensed][badge-license]][link-license]
 [![CI][badge-gh-actions]][link-gh-actions]
 
@@ -28,7 +28,8 @@ Requirements
 ------------
 
 Ansible collections:
-  - [kewlfft.aur](https://galaxy.ansible.com/kewlfft/aur).  Used for installing the Nvidia container runtime from the [AUR](https://aur.archlinux.org/).  Arch Linux only.
+
+* [kewlfft.aur](https://galaxy.ansible.com/kewlfft/aur).  Used for installing the Nvidia container runtime from the [AUR](https://aur.archlinux.org/).  Arch Linux only.
 
 Role Variables
 --------------
@@ -36,7 +37,7 @@ Role Variables
 | Variable Name                 | Default Value                       | Description                                                                                     |
 |-------------------------------|-------------------------------------|-------------------------------------------------------------------------------------------------|
 | docker_edition                | 'ce'                                | Edition to install. Can be 'ce' or 'ee'.  Note that 'ee' requires a custom URL.                 |
-| docker_repo_url               | "https://download.docker.com/linux" | Base repo for docker packages.                                                                  |
+| docker_repo_url               | "<https://download.docker.com/linux>" | Base repo for docker packages.                                                                  |
 | docker_arch                   | amd64                               | Package architecture to use.                                                                    |
 | docker_users                  | empty                               | List of users to add to the docker group. _Warning_: This grants elevated permissions.          |
 | docker_ipv4_network           | "172.16.0.1/24"                     | IPv4 default bridge network.                                                                    |
@@ -56,6 +57,7 @@ Example Playbook
 ----------------
 
 Minimal playbook:
+
 ```yaml
     - hosts: all
       roles:
@@ -63,6 +65,7 @@ Minimal playbook:
 ```
 
 A list of users to grant access to the Docker daemon can be provided with the `docker_users` variable.  This permits users to run Docker commands without root, but it does grant elevated access to the host.  Use with "trusted" users only.  Additional components can be installed as shown below:
+
 ```yaml
     - hosts: all
       roles:
@@ -84,7 +87,7 @@ Compatibility
 |------------|--------------|
 | Arch Linux | all          |
 | Debian     | 10, 11, 12   |
-| Ubuntu     | 20.04, 22.04 |
+| Ubuntu     | 20.04, 22.04, 24.04 |
 
 License
 -------
@@ -94,12 +97,11 @@ MIT
 Author Information
 ------------------
 
-https://github.com/wesmarcum/
+<https://github.com/wesmarcum/>
 
 [badge-license]: https://img.shields.io/badge/license-MIT-green?
 [link-license]: https://github.com/wesmarcum/ansible-role-docker/blob/main/LICENSE
 [badge-gh-actions]: https://github.com/wesmarcum/ansible-role-docker/workflows/CI/badge.svg?event=push
 [link-gh-actions]: https://github.com/wesmarcum/ansible-role-docker/actions?query=workflow%3ACI
 [badge-galaxy]: https://img.shields.io/badge/role-docker-blue
-[link-galaxy]: https://galaxy.ansible.com/wesmarcum/docker
-[badge-quality]: https://img.shields.io/ansible/quality/60087
+[link-galaxy]: https://galaxy.ansible.com/ui/standalone/roles/wesmarcum/docker
