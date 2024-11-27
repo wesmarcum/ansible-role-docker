@@ -19,7 +19,7 @@ platforms:
     config_options:
       ssh.keep_alive: yes
       ssh.remote_user: 'vagrant'
-    box: ${MOLECULE_BOX:-generic/debian11}
+    box: ${MOLECULE_BOX:-generic/debian12}
     memory: 2048
     cpus: 2
 provisioner:
